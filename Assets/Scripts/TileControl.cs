@@ -1,16 +1,16 @@
 using UnityEngine;
-using UnityEngine.UI; // Importante para usar Image
+using UnityEngine.UI;
 
 public class TileControl : MonoBehaviour
 {
     public Sprite greySprite;
     public Sprite colorSprite;
 
-    private Image myImage; // Cambiado de SpriteRenderer a Image
+    private Image myImage;
 
     void Awake()
     {
-        myImage = GetComponent<Image>(); // Cambiado de SpriteRenderer a Image
+        myImage = GetComponent<Image>();
     }
 
     public void UpdateVisual(bool isRevealed)
@@ -24,7 +24,7 @@ public class TileControl : MonoBehaviour
             myImage.sprite = greySprite;
         }
 
-        // ESTA LÍNEA OBLIGA A LA UI A AJUSTARSE AL RECORTE DEL SPRITE
+        
         myImage.SetNativeSize();
     }
 }
