@@ -3,13 +3,38 @@ using UnityEngine;
 public class GridManager : MonoBehaviour
 {
     public GameObject tilePrefab;
-    public int width = 10;
-    public int height = 10;
+    public GameObject trashPrefab;
+    public SpriteRenderer fondoImagen;
+
+    [Range(0f, 1f)] public float probabilidadBasura = 0.2f;
+
+    [HideInInspector] public int width;
+    [HideInInspector] public int height;
 
     void Start()
     {
+        AdaptarGridAlFondo();
         GenerarGrid();
-        AjustarCamara(); // <-- Añade esta línea
+        AjustarCamara();
+    }
+
+    void AdaptarGridAlFondo()
+    {
+        if (fondoImagen == null) return;
+
+        float fondoWidth = fondoImagen.bounds.size.x;
+        float fondoHeight = fondoImagen.bounds.size.y;
+
+        width = Mathf.RoundToInt(fondoWidth);
+        height = Mathf.RoundToInt(fondoHeight);
+
+        Vector3 esquinaInferiorIzquierda = new Vector3(
+            fondoImagen.bounds.min.x + 0.5f,
+            fondoImagen.bounds.min.y + 0.5f,
+            0
+        );
+
+        transform.position = esquinaInferiorIzquierda;
     }
 
     void GenerarGrid()
@@ -18,42 +43,34 @@ public class GridManager : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                Instantiate(tilePrefab, new Vector2(x, y), Quaternion.identity, transform);
+                Vector3 pos = transform.position + new Vector3(x, y, 0);
+
+                GameObject nuevaCasilla = Instantiate(tilePrefab, pos, Quaternion.identity, transform);
+
+                if (trashPrefab != null && Random.value < probabilidadBasura)
+                {
+                    Vector3 posBasura = new Vector3(pos.x, pos.y, -0.5f);
+                    Instantiate(trashPrefab, posBasura, Quaternion.identity, nuevaCasilla.transform);
+                }
             }
         }
     }
 
-    // --- NUEVO MÉTODO ---
     void AjustarCamara()
     {
-        Camera cam = Camera.main; // Busca la Main Camera
+        Camera cam = Camera.main;
+        if (cam == null || fondoImagen == null) return;
 
-        if (cam == null) return;
+        cam.transform.position = new Vector3(
+            fondoImagen.transform.position.x,
+            fondoImagen.transform.position.y,
+            cam.transform.position.z
+        );
 
-        // 1. Centrar la cámara
-        // Calculamos el centro exacto de la cuadrícula
-        float centerX = (width / 2f) - 0.5f;
-        float centerY = (height / 2f) - 0.5f;
-        // Movemos la cámara allí, manteniendo su Z (normalmente -10)
-        cam.transform.position = new Vector3(centerX, centerY, cam.transform.position.z);
-
-        // 2. Ajustar el Zoom (Size orthographic)
-        // El 'Size' de la cámara orthográfica es la mitad de la altura de la pantalla.
-        // Queremos que quepa el alto del grid o el ancho (lo que sea mayor).
-        float targetSize;
         float screenRatio = (float)Screen.width / (float)Screen.height;
+        float targetHeight = height / 2f;
+        float targetWidth = width / screenRatio / 2f;
 
-        if (screenRatio >= 1)
-        { // Pantalla horizontal o cuadrada
-            // El alto es el factor limitante
-            targetSize = (height / 2f) + 1f; // +1f de margen extra
-        }
-        else
-        { // Pantalla vertical (móvil, etc.)
-            // El ancho es el factor limitante
-            targetSize = ((width / screenRatio) / 2f) + 1f;
-        }
-
-        cam.orthographicSize = targetSize;
+        cam.orthographicSize = Mathf.Max(targetHeight, targetWidth) + 1f;
     }
 }

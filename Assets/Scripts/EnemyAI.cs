@@ -14,7 +14,7 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
-        // Movimiento básico hacia el jugador (o puedes hacerlo errático)
+        // Moverse hacie el jug
         transform.position = Vector2.MoveTowards(transform.position, player.position, speed * Time.deltaTime);
     }
 

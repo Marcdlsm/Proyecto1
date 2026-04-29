@@ -19,27 +19,30 @@ public class Tile : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         lineRenderer = GetComponent<LineRenderer>();
-        spriteRenderer.color = colorGrisInicial;
+
+        // Color inicial: Muy transparente (casi invisible)
+        spriteRenderer.color = new Color(0, 0, 0, 0.1f);
+
         ConfigurarLineas();
     }
 
-    // --- 3. TU MÉTODO (El de la foto) ---
     public void PrepararParaColorear()
     {
         puedoColorear = true;
+        // Cambiamos a un gris suave semitransparente para indicar que se puede pisar
         if (!estaPisada)
         {
-            spriteRenderer.color = colorFaseColorear;
+            spriteRenderer.color = new Color(1, 1, 1, 0.2f);
         }
     }
 
-    // --- 4. DETECCIÓN DEL JUGADOR ---
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player") && puedoColorear && !estaPisada)
         {
             estaPisada = true;
-            spriteRenderer.color = colorActivado;
+            // Color de victoria: Por ejemplo, un azul cian semitransparente
+            spriteRenderer.color = new Color(0, 1, 1, 0.4f);
         }
     }
 

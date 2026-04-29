@@ -7,13 +7,13 @@ public class Bullet : MonoBehaviour
 
     void Start()
     {
-        // Busca al jugador al aparecer y fija la dirección
+        // Busca al jugador al aparecer
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
             direction = (player.transform.position - transform.position).normalized;
         }
-        Destroy(gameObject, 3f); // Se destruye a los 3 segundos para no llenar la memoria
+        Destroy(gameObject, 3f); // Se destruye a los 3s
     }
 
     void Update()
@@ -25,7 +25,6 @@ public class Bullet : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // Lógica de muerte (ej: reiniciar escena)
             UnityEngine.SceneManagement.SceneManager.LoadScene(0);
         }
     }
