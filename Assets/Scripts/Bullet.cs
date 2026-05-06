@@ -2,30 +2,31 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public float speed = 5f;
-    Vector2 direction;
+    public float velocidadBala = 5f;
+    private Vector2 direccion;
 
     void Start()
     {
-        // Busca al jugador al aparecer
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
-            direction = (player.transform.position - transform.position).normalized;
+            direccion = (player.transform.position - transform.position).normalized;
         }
-        Destroy(gameObject, 3f); // Se destruye a los 3s
+        Destroy(gameObject, 4f); // Se destruye si no da a nada
     }
 
     void Update()
     {
-        transform.Translate(direction * speed * Time.deltaTime);
+        transform.Translate(direccion * velocidadBala * Time.deltaTime);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+            // Llamamos a la función de recibir daño del jugador
+            other.GetComponent<PlayerHealth>().RecibirDaño(1);
+            Destroy(gameObject);
         }
     }
 }

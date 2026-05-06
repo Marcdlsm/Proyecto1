@@ -10,12 +10,14 @@ public class GridManager : MonoBehaviour
 
     [HideInInspector] public int width;
     [HideInInspector] public int height;
+    [HideInInspector] public int totalCasillas; // Para saber cuántas hay que colorear
 
     void Start()
     {
         AdaptarGridAlFondo();
         GenerarGrid();
         AjustarCamara();
+        GenerarLimites();
     }
 
     void AdaptarGridAlFondo()
@@ -27,6 +29,7 @@ public class GridManager : MonoBehaviour
 
         width = Mathf.RoundToInt(fondoWidth);
         height = Mathf.RoundToInt(fondoHeight);
+        totalCasillas = width * height; // Guardamos el total
 
         Vector3 esquinaInferiorIzquierda = new Vector3(
             fondoImagen.bounds.min.x + 0.5f,
@@ -39,21 +42,57 @@ public class GridManager : MonoBehaviour
 
     void GenerarGrid()
     {
+        // Reiniciamos contadores en el GameManager por si acaso
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.basuraTotal = 0;
+            GameManager.instance.basuraRecogida = 0;
+        }
+
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 Vector3 pos = transform.position + new Vector3(x, y, 0);
-
                 GameObject nuevaCasilla = Instantiate(tilePrefab, pos, Quaternion.identity, transform);
 
+                // Lógica de basura
                 if (trashPrefab != null && Random.value < probabilidadBasura)
                 {
                     Vector3 posBasura = new Vector3(pos.x, pos.y, -0.5f);
                     Instantiate(trashPrefab, posBasura, Quaternion.identity, nuevaCasilla.transform);
+
+                    // Avisamos al GameManager que hay una basura más
+                    if (GameManager.instance != null) GameManager.instance.RegistrarBasura();
                 }
             }
         }
+    }
+
+    void GenerarLimites()
+    {
+        if (fondoImagen == null) return;
+
+        float ancho = fondoImagen.bounds.size.x;
+        float alto = fondoImagen.bounds.size.y;
+        Vector3 centro = fondoImagen.bounds.center;
+
+        GameObject contenedorMuros = new GameObject("LimitesMapa");
+
+        void CrearMuro(string nombre, Vector3 posicion, Vector2 tamaño)
+        {
+            GameObject muro = new GameObject(nombre);
+            muro.transform.parent = contenedorMuros.transform;
+            muro.transform.position = posicion;
+            BoxCollider2D collider = muro.AddComponent<BoxCollider2D>();
+            collider.size = tamaño;
+        }
+
+        float grosor = 1f;
+        CrearMuro("Muro_Arriba", centro + new Vector3(0, alto / 2 + grosor / 2, 0), new Vector2(ancho + (grosor * 2), grosor));
+        CrearMuro("Muro_Abajo", centro - new Vector3(0, alto / 2 + grosor / 2, 0), new Vector2(ancho + (grosor * 2), grosor));
+        CrearMuro("Muro_Izquierda", centro - new Vector3(ancho / 2 + grosor / 2, 0, 0), new Vector2(grosor, alto));
+        CrearMuro("Muro_Derecha", centro + new Vector3(ancho / 2 + grosor / 2, 0, 0), new Vector2(grosor, alto));
     }
 
     void AjustarCamara()

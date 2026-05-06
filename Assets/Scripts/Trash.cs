@@ -4,19 +4,22 @@ public class Trash : MonoBehaviour
 {
     void Start()
     {
-        // Al aparecer, le avisa al GameManager de que existe
-        GameManager.instance.RegistrarBasura();
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.RegistrarBasura();
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            // El jugador la recoge
-            GameManager.instance.RecogerBasura();
-            Destroy(gameObject); // Desaparece la basura
+            if (GameManager.instance != null)
+            {
+                GameManager.instance.RecogerBasura();
+            }
 
-            // Opcional: Sonido o efecto de partículas
+            Destroy(gameObject);
         }
     }
 }

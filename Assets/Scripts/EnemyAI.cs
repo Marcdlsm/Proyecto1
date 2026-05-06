@@ -1,25 +1,45 @@
 using UnityEngine;
 
-public class EnemyAI : MonoBehaviour
+public partial class EnemyAI : MonoBehaviour
 {
-    public float speed = 3f;
-    public Transform player;
-    public GameObject bulletPrefab;
-    public float fireRate = 2f;
+    public float velocidad = 3f;
+    public float rangoMovimiento = 4f;
+    public GameObject balaPrefab;
+    public float cadenciaDisparo = 2f;
+
+    private Vector2 puntoDestino;
+    private float tiempoSiguienteDisparo;
 
     void Start()
     {
-        InvokeRepeating("Shoot", 1f, fireRate);
+        ActualizarPuntoDestino();
     }
 
     void Update()
     {
-        // Moverse hacie el jug
-        transform.position = Vector2.MoveTowards(transform.position, player.position, speed * Time.deltaTime);
+        // Movimiento
+        transform.position = Vector2.MoveTowards(transform.position, puntoDestino, velocidad * Time.deltaTime);
+
+        if (Vector2.Distance(transform.position, puntoDestino) < 0.2f)
+        {
+            ActualizarPuntoDestino();
+        }
+
+        // Disparo
+        if (Time.time > tiempoSiguienteDisparo)
+        {
+            Disparar();
+            tiempoSiguienteDisparo = Time.time + cadenciaDisparo;
+        }
     }
 
-    void Shoot()
+    void ActualizarPuntoDestino()
     {
-        Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+        puntoDestino = new Vector2(Random.Range(-rangoMovimiento, rangoMovimiento), Random.Range(-rangoMovimiento, rangoMovimiento));
+    }
+
+    void Disparar()
+    {
+        Instantiate(balaPrefab, transform.position, Quaternion.identity);
     }
 }
