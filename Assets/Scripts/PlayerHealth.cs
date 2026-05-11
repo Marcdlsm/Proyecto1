@@ -11,12 +11,6 @@ public class PlayerHealth : MonoBehaviour
     void Start()
     {
         vidaActual = vidaMax;
-
-        if (barraVida != null)
-        {
-            barraVida.maxValue = vidaMax;
-            barraVida.value = vidaMax;
-        }
     }
 
     public void RecibirDaño(int daño)
