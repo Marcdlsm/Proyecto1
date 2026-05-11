@@ -1,5 +1,6 @@
-using UnityEngine;
+using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class GameManager : MonoBehaviour
     [Header("Ajustes de Juego")]
     public int basuraTotal = 0;
     public int basuraRecogida = 0;
+    public TextMeshProUGUI textoBasura;
     public bool faseLimpiezaCompletada = false;
 
     [Header("Paneles UI")]
@@ -16,24 +18,52 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        if (instance == null) instance = this;
-        else Destroy(gameObject);
+        if (instance == null)
+        {
+            instance = this; 
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
 
         Time.timeScale = 1f;
+    }
+
+    void Start()
+    {
+        ActualizarInterfaz();
     }
 
     public void RegistrarBasura()
     {
         basuraTotal++;
+        ActualizarInterfaz();
     }
 
     public void RecogerBasura()
     {
         basuraRecogida++;
+        ActualizarInterfaz();
 
         if (basuraRecogida >= basuraTotal)
         {
             CompletarFaseLimpieza();
+        }
+    }
+
+    public void ActualizarInterfaz()
+    {
+        if (textoBasura != null)
+        {
+            textoBasura.text = "Basura: " + basuraRecogida + " / " + basuraTotal;
+            textoBasura.color = Color.yellow;
+        }
+        else
+        {
+            // Ver si el hueco está vacío
+            Debug.LogWarning("Textobasura vacío");
         }
     }
 
@@ -45,24 +75,25 @@ public class GameManager : MonoBehaviour
         Tile[] todasLasCasillas = Object.FindObjectsByType<Tile>(FindObjectsSortMode.None);
         foreach (Tile tile in todasLasCasillas)
         {
-            tile.PrepararParaColorear();
+            if (tile != null) tile.PrepararParaColorear();
         }
     }
 
     public void GanarJuego()
     {
-        pantallaGanar.SetActive(true);
+        if (pantallaGanar != null) pantallaGanar.SetActive(true);
         Time.timeScale = 0f;
     }
 
     public void PerderJuego()
     {
-        pantallaPerder.SetActive(true);
+        if (pantallaPerder != null) pantallaPerder.SetActive(true);
         Time.timeScale = 0f;
     }
 
     public void ReiniciarJuego()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
