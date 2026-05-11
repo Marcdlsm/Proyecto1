@@ -10,7 +10,7 @@ public class GridManager : MonoBehaviour
 
     [HideInInspector] public int width;
     [HideInInspector] public int height;
-    [HideInInspector] public int totalCasillas; // Para saber cuántas hay que colorear
+    [HideInInspector] public int totalCasillas;
 
     void Start()
     {
@@ -29,7 +29,7 @@ public class GridManager : MonoBehaviour
 
         width = Mathf.RoundToInt(fondoWidth);
         height = Mathf.RoundToInt(fondoHeight);
-        totalCasillas = width * height; // Guardamos el total
+        totalCasillas = width * height;
 
         Vector3 esquinaInferiorIzquierda = new Vector3(
             fondoImagen.bounds.min.x + 0.5f,
@@ -42,7 +42,6 @@ public class GridManager : MonoBehaviour
 
     void GenerarGrid()
     {
-        // Reiniciamos contadores en el GameManager por si acaso
         if (GameManager.instance != null)
         {
             GameManager.instance.basuraTotal = 0;
@@ -56,13 +55,11 @@ public class GridManager : MonoBehaviour
                 Vector3 pos = transform.position + new Vector3(x, y, 0);
                 GameObject nuevaCasilla = Instantiate(tilePrefab, pos, Quaternion.identity, transform);
 
-                // Lógica de basura
                 if (trashPrefab != null && Random.value < probabilidadBasura)
                 {
                     Vector3 posBasura = new Vector3(pos.x, pos.y, -0.5f);
                     Instantiate(trashPrefab, posBasura, Quaternion.identity, nuevaCasilla.transform);
 
-                    // Avisamos al GameManager que hay una basura más
                     if (GameManager.instance != null) GameManager.instance.RegistrarBasura();
                 }
             }

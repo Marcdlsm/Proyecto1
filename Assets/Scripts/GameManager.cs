@@ -57,8 +57,8 @@ public class GameManager : MonoBehaviour
     {
         if (textoBasura != null)
         {
-            textoBasura.text = "Basura: " + basuraRecogida + " / " + basuraTotal;
-            textoBasura.color = Color.yellow;
+            textoBasura.text = "Basura: " + basuraRecogida + " / " + basuraTotal*0.5;
+            if (basuraRecogida == basuraTotal*0.5) GanarJuego();
         }
         else
         {
